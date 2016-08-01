@@ -1,19 +1,23 @@
 import restler from 'restler';
 
 export default function extendSendwithusApi(api) {
-  return Object.assign({
-    getTemplates(callback) {
-      const url = this._buildUrl('templates');
+  if (!api.getTemplates) {
+    // XXX: Object mutation, probably want to rewrite the sendwithus client lib to not
+    // use classes, and more so, support all the sendwithus api calls!
+    api.getTemplates = function(callback) {
+      const url = api._buildUrl('templates');
 
-      const options = this._getOptions();
+      const options = api._getOptions();
 
-      this.emit('request', 'GET', url, options.headers);
+      api.emit('request', 'GET', url, options.headers);
       restler
-        .get(url, options)
-        .once('complete', (result, response) => {
-          this._handleResponse.call(this, result, response, callback);
-        });
-    },
-  }, api);
+      .get(url, options)
+      .once('complete', (result, response) => {
+        api._handleResponse.call(api, result, response, callback);
+      });
+    };
+  }
+
+  return api;
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "feathers-sendwithus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Feathers service for sending mailers with sendwithus.com.",
   "main": "./lib",
   "scripts": {
@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0",
     "babel-tape-runner": "^2.0.1",

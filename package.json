@@ -1,5 +1,5 @@
 {
-  "name": "functional-sendwithus",
+  "name": "feathers-sendwithus",
   "version": "0.0.1",
   "description": "Feathers service for sending mailers with sendwithus.com.",
   "main": "./lib",
@@ -25,9 +25,10 @@
     "url": "git+https://github.com/fixate/feathers-sendwithus.git"
   },
   "keywords": [
-    "validation",
-    "functional",
-    "validate"
+    "feathers",
+    "sendwithus",
+    "mailer",
+    "email"
   ],
   "author": "Stan Bondi <stan@fixate.it>",
   "license": "GPL-3.0",

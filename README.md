@@ -1,6 +1,6 @@
 # feathers-sendwithus
 
-[![Build Status](https://travis-ci.org/fixate/feathers-sendwithme.svg?branch=master)](https://travis-ci.org/fixate/feathers-sendwithme)
+[![Build Status](https://travis-ci.org/fixate/feathers-sendwithus.svg?branch=master)](https://travis-ci.org/fixate/feathers-sendwithus)
 
 Feathers service for sending mailers with [sendwithus](sendwithus.com).
 

@@ -10,6 +10,7 @@ test('Options', (t) => {
 [
   './service',
   './templateMapper',
+    './utils.js',
 ].forEach((p) => {
   require(p)(test);
 });

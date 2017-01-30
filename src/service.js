@@ -5,8 +5,18 @@ const ACT_BATCH = 'batch'
 
 const debug = Debug('feathers-sendwithus:service');
 
+const _execApiCall=function(data,api,callType){
+    api[callType](data, (err, result) => {
+        if (err) {
+            return this.reject(err);
+        }
+        this.resolve(result);
+    });
+}
+
 export default function createService({ api, templateMapper,batchOpts }) {
-  const {path='/api/v1/send',method='POST'}=batchOpts || {}
+  const {path='/api/v1/send',method='POST',size=10}=batchOpts || {}
+
   return Object.create({
     setup(app) {
       this.app = app;
@@ -18,6 +28,7 @@ export default function createService({ api, templateMapper,batchOpts }) {
       return templateMapper(param_template)
         .then((template) =>
           new Promise((resolve, reject) => {
+            const context={resolve,reject};
             const data = (isArray(params))?params.map(d=>{
                     return{
                         body:Object.assign({},d,{template}),
@@ -25,13 +36,14 @@ export default function createService({ api, templateMapper,batchOpts }) {
                         method
                     }
                 }):Object.assign({}, params, { template });
-
-            api[(isArray(data))?ACT_BATCH:ACT_SEND](data, (err, result) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(result);
-            });
+            if(isArray(data)){
+                for (let i = 0; i < data.length; i+=size) {
+                    _execApiCall.call(context,data.slice(i,i+size),api,ACT_BATCH)
+                }
+            }
+            else{
+                _execApiCall.call(context,data,api,ACT_SEND)
+            }
           })
         );
     },

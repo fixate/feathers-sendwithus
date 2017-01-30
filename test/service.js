@@ -15,7 +15,8 @@ module.exports = function(test) {
   sinon.spy(api, 'batch');
 
   const templateMapper = (t) => Promise.resolve(`${t}'`);
-  const service = createService({ api, templateMapper });
+  const batchOpts={size:2}
+  const service = createService({ api, templateMapper,batchOpts});
 
   test("Service", function*(t) {
     //const data =
@@ -30,11 +31,12 @@ module.exports = function(test) {
   });
 
     test("Service - batch email send", function*(t) {
+
         const data =fakeMails;
 
         const result = yield service.create(data);
         //console.log(result)
-        const expected= batchFixture(fakeResponse)
+        const expected= batchFixture(fakeResponse.slice(0,2))
         t.deepEqual(result,expected);
 
         t.ok(api.batch.called, 'Api batch called');
@@ -42,6 +44,10 @@ module.exports = function(test) {
         t.deepEquals(api.batch.getCall(0).args[0][0].body.template, 'theId\'', 'Calls with mapped template');
         t.deepEquals(api.batch.getCall(0).args[0][0].method, 'POST', 'calls with POST method');
         t.deepEquals(api.batch.getCall(0).args[0][0].path, '/api/v1/send', 'calls with send path');
+        t.equal(api.batch.callCount,2,'calls batch api twice')
+        t.deepEqual(api.batch.getCall(1).args[0],batchFixture(fakeResponse.slice(2,4)),'second call holds next pair of args')
     });
+
+
 
 };

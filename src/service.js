@@ -9,20 +9,19 @@ export default function createService({ api, templateMapper }) {
     },
 
     create(params) {
-      debug(`create: ${JSON.stringify(params)}`)
+      debug(`create: ${JSON.stringify(params)}`);
       return templateMapper(params.template)
-        .then((template) =>
-          new Promise((resolve, reject) => {
-            const data = Object.assign({}, params, { template });
-            api.send(data, (err, result) => {
-              if (err) {
-                return reject(err);
-              }
+        .then(template => new Promise((resolve, reject) => {
+          const data = Object.assign({}, params, { template });
+          api.send(data, (err, result) => {
+            if (err) {
+              reject(err);
+              return;
+            }
 
-              resolve(result);
-            });
-          })
-        );
+            resolve(result);
+          });
+        }));
     },
   });
 }

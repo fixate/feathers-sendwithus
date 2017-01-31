@@ -9,7 +9,7 @@ const debug = Debug('feathers-sendwithus:main');
 
 function checkOpts(opts) {
   if (!opts.apiKey) {
-    throw new Error("Sendwithus API key was not passed to feathersSendwithus().")
+    throw new Error('Sendwithus API key was not passed to feathersSendwithus().');
   }
 }
 
@@ -27,7 +27,7 @@ export default function feathersSendwithus(config) {
   const api = extendSendwithusApi(sendwithus(options.apiKey));
   const templateMapper = options.templateNameMapping ?
     options.templateMapper(api, options) :
-    (t) => Promise.resolve(t);
+    t => Promise.resolve(t);
 
   return createService({ api, templateMapper });
 }

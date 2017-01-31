@@ -11,5 +11,6 @@ test('Options', (t) => {
   './service',
   './templateMapper',
 ].forEach((p) => {
+  /* eslint global-require: 0, import/no-dynamic-require: 0 */
   require(p)(test);
 });

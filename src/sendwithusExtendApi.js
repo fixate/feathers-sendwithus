@@ -1,9 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 import restler from 'restler';
 
 export default function extendSendwithusApi(api) {
   if (!api.getTemplates) {
     // XXX: Object mutation, probably want to rewrite the sendwithus client lib to not
     // use classes, and more so, support all the sendwithus api calls!
+    /* eslint no-param-reassign: 0 */
     api.getTemplates = function(callback) {
       const url = api._buildUrl('templates');
 
@@ -20,4 +22,4 @@ export default function extendSendwithusApi(api) {
 
   return api;
 }
-
+/* eslint-enable no-underscore-dangle */

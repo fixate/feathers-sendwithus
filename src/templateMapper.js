@@ -28,6 +28,6 @@ export default function createTemplateMapper(api, options) {
     });
   }
 
-  return (t) => fetchTemplates()
-  .then((templates) => (templates.find((tmpl) => tmpl.name === t) || { id: t }).id);
+  return t => fetchTemplates()
+    .then(templates => (templates.find(tmpl => (tmpl.name === t)) || { id: t }).id);
 }

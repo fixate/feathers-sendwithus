@@ -4,7 +4,7 @@ module.exports = function(test) {
   test('Template Mapper', function* (t) {
     const mockApi = {
       getTemplates(cb) {
-        cb(null, [{ name:'a', id: '123' }, { name: 'friendly', id: 'theId' }]);
+        cb(null, [{ name: 'a', id: '123' }, { name: 'friendly', id: 'theId' }]);
       },
     };
 

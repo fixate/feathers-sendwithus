@@ -28,6 +28,6 @@ export default function feathersSendwithus(config) {
   const templateMapper = options.templateNameMapping ?
     options.templateMapper(api, options) :
     (t) => Promise.resolve(t);
-  const batchOpts = {config}
+  const {batchOpts} = options
   return createService({ api, templateMapper,batchOpts });
 }

@@ -5,7 +5,7 @@ const ACT_BATCH = 'batch'
 
 const debug = Debug('feathers-sendwithus:service');
 
-const _execApiCall=function(data,api,callType){
+const execApiCall=function(data,api,callType){
     api[callType](data, (err, result) => {
         if (err) {
             return this.reject(err);
@@ -15,7 +15,7 @@ const _execApiCall=function(data,api,callType){
 }
 
 export default function createService({ api, templateMapper,batchOpts }) {
-  const {path='/api/v1/send',method='POST',size=10}=batchOpts || {}
+  const {path='/api/v1/send',method='POST',chunkSize=10}=batchOpts || {}
 
   return Object.create({
     setup(app) {
@@ -37,12 +37,12 @@ export default function createService({ api, templateMapper,batchOpts }) {
                     }
                 }):Object.assign({}, params, { template });
             if(isArray(data)){
-                for (let i = 0; i < data.length; i+=size) {
-                    _execApiCall.call(context,data.slice(i,i+size),api,ACT_BATCH)
+                for (let i = 0; i < data.length; i+=chunkSize) {
+                    execApiCall.call(context,data.slice(i,i+chunkSize),api,ACT_BATCH)
                 }
             }
             else{
-                _execApiCall.call(context,data,api,ACT_SEND)
+                execApiCall.call(context,data,api,ACT_SEND)
             }
           })
         );

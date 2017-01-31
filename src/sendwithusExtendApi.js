@@ -27,7 +27,7 @@ export default function extendSendwithusApi(api) {
   if (!api.batch){
     api.batch = function(data,callback){
 
-        const url = api._buildUrl('bath');
+        const url = api._buildUrl('batch');
 
         const options = api._getOptions();
         

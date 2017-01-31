@@ -1,7 +1,5 @@
 import Debug from 'debug';
 import isArray from "lodash/isArray"
-const ACT_SEND = 'send'
-const ACT_BATCH = 'batch'
 
 const debug = Debug('feathers-sendwithus:service');
 
@@ -21,12 +19,12 @@ export default function createService({ api, templateMapper,batchOpts }) {
           new Promise((resolve, reject) => {
             const context = { resolve, reject };
             const data = isArray(params) ? 
-                  params.map(d => ({
+                  params.map(d =>({
                     body: Object.assign({}, d, { template }),
                     path,
                     method,
                   })
-                }) : Object.assign({}, params, { template });
+                ) : Object.assign({}, params, { template });
         
             if (isArray(data)) {
               // TODO: Refactor

@@ -20,7 +20,7 @@ coverage
 build/Release
 
 # .idea directory
-.idea/
+.idea
 
 # Dependency directory
 # Commenting this out is preferred by some people, see

@@ -18,6 +18,7 @@ export default function feathersSendwithus(config) {
     templateNameMapping: true,
     templateNameCacheTimeout: '1h',
     templateMapper: createTemplateMapper,
+    batchChunkSize: 10,
   }, config);
 
   debug(`Creating feathers-sendwithus service with options: ${JSON.stringify(options)}`);
@@ -28,6 +29,6 @@ export default function feathersSendwithus(config) {
   const templateMapper = options.templateNameMapping ?
     options.templateMapper(api, options) :
     t => Promise.resolve(t);
-  const { batchOpts } = options;
-  return createService({ api, templateMapper,batchOpts });
+
+  return createService({ ...options, api, templateMapper });
 }

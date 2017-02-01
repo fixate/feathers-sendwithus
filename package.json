@@ -1,6 +1,6 @@
 {
   "name": "feathers-sendwithus-batch",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Feathers service for sending mailers with sendwithus.com.",
   "main": "./lib",
   "scripts": {
@@ -8,7 +8,7 @@
     "prepublish": "npm run compile",
     "watch": "npm-watch",
     "lint": "eslint src/ test/ || true",
-    "tape": "babel-tape-runner test | tap-spec || true",
+    "tape": "babel-tape-runner test | tap-spec",
     "test": "npm run lint && npm run tape",
     "commit": "git cz -a "
   },
@@ -38,12 +38,13 @@
   },
   "homepage": "https://github.com/feathers-sendwithus#readme",
   "dependencies": {
+    "async": "^2.1.4",
     "debug": "^2.2.0",
-    "lodash": "^4.17.4",
+    "lodash.chunk": "^4.2.0",
+    "lodash.flatten": "^4.4.0",
     "moment": "^2.14.1",
     "restler": "^3.4.0",
-    "sendwithus": "^2.9.2",
-    "simple-rate-limiter": "^0.2.3"
+    "sendwithus": "^2.9.2"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -53,9 +54,9 @@
     "babel-tape-runner": "^2.0.1",
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.2.0",
-    "faker": "^3.1.0",
     "eslint-config-airbnb-base": "^11.0.1",
     "eslint-plugin-import": "^2.2.0",
+    "faker": "^3.1.0",
     "npm-watch": "^0.1.5",
     "rimraf": "^2.5.4",
     "sinon": "^1.17.5",

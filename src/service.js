@@ -1,59 +1,75 @@
 import Debug from 'debug';
-import isArray from "lodash/isArray"
+import chunk from 'lodash.chunk';
+import flatten from 'lodash.flatten';
+import mapSeries from 'async/mapSeries';
 
 const debug = Debug('feathers-sendwithus:service');
 
-export default function createService({ api, templateMapper,batchOpts }) {
-  const {path='/api/v1/send',method='POST',chunkSize=10}=batchOpts || {}
+function extractTemplateNames(data) {
+  return Array.isArray(data) ? data.map(d => d.template) : [data.template];
+}
 
-  return Object.create({
+export default function createService(options) {
+  const { api, templateMapper } = options;
+
+  function callBatchApi(batch, callback) {
+    api.batch(batch, callback);
+  }
+
+  function batchSend(data) {
+    const preparedData = data.map(d => ({
+      body: d,
+      path: '/api/v1/send',
+      method: 'POST',
+    }));
+
+    const chunks = chunk(preparedData, options.batchChunkSize);
+    return new Promise((resolve, reject) => {
+      mapSeries(chunks, callBatchApi, (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(flatten(results));
+      });
+    });
+  }
+
+  function send(data) {
+    return new Promise((resolve, reject) => {
+      api.send(data, (err, result) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(result);
+      });
+    });
+  }
+
+  return {
     setup(app) {
       this.app = app;
     },
 
-    create(params) {
-      debug(`create: ${JSON.stringify(params)}`)
-      const param_template = (isArray(params))?params[0].template:params.template
-      return templateMapper(param_template)
-        .then(template =>
-          new Promise((resolve, reject) => {
-            const context = { resolve, reject };
-            const data = isArray(params) ? 
-                  params.map(d =>({
-                    body: Object.assign({}, d, { template }),
-                    path,
-                    method,
-                  })
-                ) : Object.assign({}, params, { template });
-        
-            if (isArray(data)) {
-              // TODO: Refactor
-              for (let i = 0; i < data.length; i+=chunkSize) {
-                const chunk = data.slice(i, i + chunkSize);
-                api.batch(chunk, (err, result) => {
-                  if (err) { 
-                    reject(err);
-                    return;
-                  }
-                    
-                  resolve(result);
-                });                    
-              }
-            }
-            else {
-              api.send(data,  (err, result) => {
-                if (err) { 
-                  reject(err);
-                  return;
-                }
+    create(data) {
+      debug(`create: ${JSON.stringify(data)}`);
 
-                resolve(result);
-              });
-            }
-          })
-        );
+      const templateNames = extractTemplateNames(data);
 
+      return templateMapper(templateNames)
+        .then((templates) => {
+          if (Array.isArray(data)) {
+            const payload = data.map((d, i) => Object.assign({}, d, { template: templates[i] }));
+            return batchSend(payload);
+          }
+
+          const payload = Object.assign({}, data, { template: templates[0] });
+          return send(payload, templates[0]);
+        });
     },
-  });
+  };
 }
 

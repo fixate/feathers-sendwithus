@@ -1,52 +1,50 @@
 import sinon from 'sinon';
 
-import { batchFixture, fixtures } from "./test-utils"
+import fixtures from './fixtures';
 import createService from '../src/service';
-
-const fakeMails = fixtures.getData(4)
-const fakeResponse = fakeMails.map(m=>{
-    return Object.assign({},m,{template:m.template+ '\''})
-})
 
 module.exports = function(test) {
   const api = {
-    send(data, cb) { cb(null, data); },
-    batch(data, cb) { cb(null, data); }
+    send(data, cb) { cb(null, Object.assign({ api: true }, data)); },
+    batch(data, cb) { cb(null, data.map(d => Object.assign({ api: true }, d.body))); },
   };
 
   sinon.spy(api, 'send');
   sinon.spy(api, 'batch');
 
-  const templateMapper = t => Promise.resolve(`${t}'`);
-  const batchOpts = { chunkSize: 2 };
-  const service = createService({ api, templateMapper,batchOpts});
+  const templateMapper = names => Promise.resolve(names.map(n => `${n}'`));
+  const service = createService({ api, templateMapper, batchChunkSize: 2 });
 
-  test("Service", function*(t) {
-    //const data =
-    const data = fakeMails[0]
+  test('Service', function* (t) {
+    const data = fixtures.sendRequest();
     const result = yield service.create(data);
+    const expectedResponse = Object.assign({}, data, { api: true, template: `${data.template}'` });
 
-    t.deepEqual(result, fakeResponse[0]);
+    t.deepEqual(result, expectedResponse, 'Correct response');
 
     t.ok(api.send.called, 'Api Send called');
     t.deepEquals(api.send.getCall(0).args[0].recipient, data.recipient, 'Calls with data');
-    t.deepEquals(api.send.getCall(0).args[0].template, 'theId\'', 'Calls with mapped template');
+    t.deepEquals(api.send.getCall(0).args[0].template, `${data.template}'`, 'Calls with mapped template');
   });
 
-  test("Service - batch email send", function*(t) {
-    const data = fakeMails;
+  test('Service - batch email send', function* (t) {
+    const fakeBatch = fixtures.batchSendRequest(3);
 
-    const result = yield service.create(data);
-    //console.log(result)
-    const expected= batchFixture(fakeResponse.slice(0,2));
-    t.deepEqual(result,expected);
+    const result = yield service.create(fakeBatch);
+    const expected = fakeBatch.map(d => Object.assign({}, d, { api: true, template: `${d.template}'` }));
+    t.deepEqual(result, expected, 'Expected results');
 
     t.ok(api.batch.called, 'Api batch called');
-    t.deepEquals(api.batch.getCall(0).args[0][0].body.recipient, data[0].recipient, 'Calls with data');
-    t.deepEquals(api.batch.getCall(0).args[0][0].body.template, 'theId\'', 'Calls with mapped template');
+    t.deepEquals(api.batch.getCall(0).args[0][0].body.recipient, fakeBatch[0].recipient, 'Calls with data');
+    t.deepEquals(api.batch.getCall(0).args[0][0].body.template, `${fakeBatch[0].template}'`, 'Calls with mapped template');
     t.deepEquals(api.batch.getCall(0).args[0][0].method, 'POST', 'calls with POST method');
     t.deepEquals(api.batch.getCall(0).args[0][0].path, '/api/v1/send', 'calls with send path');
-    t.equal(api.batch.callCount,2,'calls batch api twice')
-    t.deepEqual(api.batch.getCall(1).args[0],batchFixture(fakeResponse.slice(2,4)),'second call holds next pair of args')
+    t.equal(api.batch.callCount, 2, 'Calls batch api with each batch');
+    const expectedSecondBatch = [{
+      body: Object.assign({}, fakeBatch[1], { template: `${fakeBatch[1].template}'` }),
+      method: 'POST',
+      path: '/api/v1/send',
+    }];
+    t.deepEqual(api.batch.getCall(1).args[0], expectedSecondBatch, 'second call holds next pair of args');
   });
 };

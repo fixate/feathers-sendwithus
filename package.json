@@ -1,5 +1,5 @@
 {
-  "name": "feathers-sendwithus-batch",
+  "name": "feathers-sendwithus",
   "version": "0.1.0",
   "description": "Feathers service for sending mailers with sendwithus.com.",
   "main": "./lib",

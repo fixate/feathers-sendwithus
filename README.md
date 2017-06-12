@@ -4,8 +4,6 @@
 
 Feathers service for sending mailers with [sendwithus](sendwithus.com).
 
-STATUS: Under development (used in production since 0.0.4)
-
 ## Installation
 
 `npm install --save feathers-sendwithus`
